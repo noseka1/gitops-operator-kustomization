@@ -11,5 +11,24 @@ spec:
   sourceNamespace: openshift-marketplace
   config:
     env:
+    # Do not create the default instance in the openshift-gitops namespace
     - name: DISABLE_DEFAULT_ARGOCD_INSTANCE
       value: "false"
+    # By default, Argo CD instances can only read cluster-scoped resources. To allow Argo
+    # CD to create/update cluster-scoped resources, additional priviliges are required.
+    #
+    # Argo CD can be granted create/update privileges to a list of specific cluster-scoped
+    # resources. These privileges are defined in the ClusterRole object
+    # openshift-gitops-openshift-gitops-argocd-application-controller and
+    # openshift-gitops-openshift-gitops-argocd-server. To grant these privileges to a
+    # specific Argo CD instance, one needs to add the namespace where this instance is
+    # located to the ARGOCD_CLUSTER_CONFIG_NAMESPACES command-separated list, see below.
+    #
+    # If Argo CD requires additional privileges, one can create a custom ClusterRole and
+    # ClusterRoleBinding to assign these privileges to the Argo CD service account in the
+    # specific namespace.
+    #
+    # See also:
+    # https://github.com/redhat-developer/gitops-operator/blob/master/docs/OpenShift%20GitOps%20Usage%20Guide.md#default-permissions-provided-to-argo-cd-instance
+    - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
+      value: "openshift-gitops"
